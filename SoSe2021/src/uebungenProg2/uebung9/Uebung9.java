@@ -3,24 +3,27 @@ package uebungenProg2.uebung9;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-public class Uebung9 extends JFrame implements  ActionListener
+public class Uebung9 extends JFrame implements ActionListener
 {
     //Objektvariablen: 
     //1. Textfeld, zwei Buttons (add und remove)
     //2. unteres Panel
     //4. Liste mit Labeln
 	
-	JLabel textfeld;
+	JTextField textfeld;
 	JPanel unten;
     JButton b1;
     JButton b2;
@@ -46,104 +49,71 @@ public class Uebung9 extends JFrame implements  ActionListener
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(2,1));  // 2 Zeilen und 1 Spalte
 
+        // bei Grid und Flow Layout spielt die Reihenfoge eine Rolle
         JPanel oben = new JPanel();
-        oben.setLayout(new FlowLayout());       
-        oben.setBackground(Color.YELLOW);
-        
-        this.textfeld = new JLabel("Text");
+        this.textfeld = new JTextField(10);
         this.b1 = new JButton("add");
+        this.b1.setActionCommand("add"); //dopplelmoppel?
         this.b2 = new JButton("remove");
         
-        oben.add(textfeld); 
-        oben.add(b1); 
-        oben.add(b2); 
+        oben.setBackground(Color.YELLOW);
+        oben.add(this.textfeld); 
+        oben.add(this.b1); 
+        oben.add(this.b2); 
+        
+        this.b1.addActionListener(this);
+        this.b2.addActionListener(this);
+        
+        mainPanel.add(oben);
         
         this.unten = new JPanel();
         unten.setBackground(Color.CYAN);
         
-
-        /*JPanel links = new JPanel();
-        links.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 50));
-        JLabel text2 = new JLabel("Weiterer Text");
-        links.add(text2);
-        JTextField input = new JTextField("Feld",10);
-        links.add(input);       
-        links.setBackground(Color.LIGHT_GRAY);
-
-
-        JPanel rechts = new JPanel();
-        rechts.setLayout(new GridLayout(2,1,20,20));
-        rechts.add(new JButton("Button 1"));*/
-        
-
-     
-       
-
-        return mainPanel;
-    
-
-    
-    //2. main-JPanel in JPanels unten und oben unterteilen
-    //Dem Panel oben werden das Textfeld und die beiden Buttons hinzugefügt,
-    //das lagern wir in die Methode createOben() aus
-    //oben: Hintergrundfarbe ist YELLOW
-    //unten: Hintergrundfarbe ist CYAN
-    //Das Panel unten soll ebenfalls eine Objektvariable sein.
-
-    //4. neue ArrayList für die Label anlegen 
+        mainPanel.add(unten);
+        return mainPanel;   //Fensteroptik erscheint vollständig
 }
-
-    /*private JPanel createOben()
-    {
-        //...
-
-        return panel;
-    }*/
 
     @Override
     public void actionPerformed(ActionEvent e) 
     {
 
-        //Quelle des Events ermitteln
-
-        //Falls es der "add"-Button ist
-        // - Text aus dem Textfeld übernehmen
-        // - neues Label mit dem Text anlegen 
-        // - das Label formatieren (Hintergrundfarbe RED)
-        //   Tipp: wenn Sie einem JLabel eine Hintergrundfarbe mit setBackground(Color c) 
-        //   setzen, dann sieht man diese nur, wenn Sie für dieses JLabel die Methode 
-        //   setOpaque(true) aufrufen. Nur dadurch werden für dieses JLabel alle Pixel 
-        //   gezeichnet, die in dessen Grenzen sind, d.h. das komplette Rechteck, 
-        //   das das JLabel ausfüllt. Ansonsten würde nur der Text "gezeichnet" und 
-        //   die Hintergrundfarbe wäre hinter dem Text versteckt.
-        // - das Label in Label-Liste einfügen 
-        // - das Label dem unteren Panel hinzufügen
-
-        //Falls es der "remove"-Button ist
-        // - Text aus dem Textfeld übernehmen
-        // - durch die Label-Liste iterieren, um das zu entfernende Label zu finden  
-        //   Tipp: Iterator nehmen
-        //   Iterator<Typ> it = variable.iterator();
-        //   while(it.hasNext()){ 
-        //      mach irgendwas mit it.next()
-        //   } 
-        //   das Label muss sowohl aus der Liste als auch aus dem Panel entfernt werden 
-
-        //Text im Textfeld löschen      
-        //weitere nötige Schritte requestFocus(), revalidate(), repaint()
-
+    	Object quelle = e.getSource();    // welche Komponente hat das Actionevent ausglöst, d.h. welcher Button wurde geklickt?
+		if(quelle instanceof JButton) 
+		{
+			JButton button = (JButton) quelle;
+			if(button.getActionCommand().equals("add")) 
+			{
+				JLabel neu = new JLabel(this.textfeld.getText());
+				neu.setOpaque(true);
+				neu.setBackground(Color.RED);
+				neu.setForeground(Color.WHITE);
+				this.labels.add(neu);
+				this.unten.add(neu);
+				System.out.println(this.textfeld.getText()); //gibt den Text im Textfeld auf der Konsole aus 
+				System.out.println("Es wurde der add-Button geklickt!");
+			}
+			else if(button.getActionCommand().equals("remove"))
+			{
+				String inputText = this.textfeld.getText();
+				Iterator<JLabel> itero = this.labels.iterator();
+				while(itero.hasNext()) 
+				{
+					JLabel aktLabel = itero.next();
+					if(aktLabel.getText().equals(inputText)) 
+					{
+						itero.remove();
+						this.unten.remove(aktLabel);
+					}
+				}
+				System.out.println("Es wurde der remove-Button geklickt!");
+			}
+			this.unten.revalidate();
+			this.unten.repaint();
+		}
     }
 
     public static void main(String[] args) 
     {
         new Uebung9();
     }
-
-    
-    
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		System.out.println("wurde geklickt");
-		
-	}
 }
